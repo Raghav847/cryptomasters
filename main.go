@@ -3,11 +3,22 @@ package main
 import (
 	"fmt"
 	"go/crypto/api"
+	"sync"
 )
 
+// main routine
 func main() {
-	getCurrencyData("BTC")
-	getCurrencyData("ETH")
+	currencies := []string{"BTC", "ETH", "BCH"}
+	var wg sync.WaitGroup
+	for _, currency := range currencies {
+		wg.Add(1)
+		go func(currencyCode string) {
+			getCurrencyData(currencyCode) //new goroutine
+			wg.Done()
+		}(currency)
+
+	}
+	wg.Wait()
 }
 
 func getCurrencyData(currency string) {
